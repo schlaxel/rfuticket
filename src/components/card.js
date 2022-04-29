@@ -17,13 +17,28 @@ const Wrapper = styled.div`
     align-items: center;
 `;
 
+const Content = styled.div`
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+`;
+
 const CardWrapper = styled.div`
     background: #fff;
     border-radius: 15px;
     padding: 20px;
-    margin: auto;
     min-width: 200px;
     aspect-ratio: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+`;
+
+const CardOuter = styled.div`
+    flex: 1;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -39,6 +54,12 @@ const Footer = styled.div`
 const Control = styled.div`
     display: flex;
     justify-content: space-around;
+`;
+
+const Nummer = styled.div`
+    color: ${({ theme }) => theme.colors.fg};
+    margin-top: 10px;
+    font-weight: 600;
 `;
 
 const Card = () => {
@@ -77,13 +98,18 @@ const Card = () => {
 
     return (
         <Wrapper>
-            {isEdit ? (
-                <EditComponent setCardId={(id) => onSetCardId(id)} />
-            ) : (
-                <CardWrapper>
-                    <canvas id="mycanvas"></canvas>
-                </CardWrapper>
-            )}
+            <Content>
+                {isEdit ? (
+                    <EditComponent setCardId={(id) => onSetCardId(id)} />
+                ) : (
+                    <CardOuter>
+                        <CardWrapper>
+                            <canvas id="mycanvas"></canvas>
+                        </CardWrapper>
+                        <Nummer>{cardId}</Nummer>
+                    </CardOuter>
+                )}
+            </Content>
             <Footer>
                 <Control>
                     <CircleWithMinus
