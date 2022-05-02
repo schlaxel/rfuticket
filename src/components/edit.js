@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { HelpWithCircle, ChevronSmallDown, Share } from 'styled-icons/entypo/';
 import help_circle from '../help_circle.jpg';
@@ -72,6 +72,7 @@ const ShareInput = styled.input`
 `;
 
 const Edit = ({ setCardObj }) => {
+    const hasChangedVal = useRef(false);
     const [val, setVal] = useState({ id: '', platz: '', reihe: '' });
     const [showHelp, setShowHelp] = useState(false);
     const [showMore, setShowMore] = useState(false);
@@ -80,17 +81,19 @@ const Edit = ({ setCardObj }) => {
 
     useEffect(() => {
         let cardObjFromLS = JSON.parse(localStorage.getItem('cardObj'));
-        if (cardObjFromLS) {
+        if (cardObjFromLS && !hasChangedVal.current) {
             // code existiert bereits in Local Storage
             setVal(cardObjFromLS);
         }
 
-        if (searchParams.get('id')) {
+        if (searchParams.get('id') && !hasChangedVal.current) {
             const obj = val;
             obj['id'] = searchParams.get('id');
             setVal({ ...obj });
         }
-    }, [searchParams]);
+
+        hasChangedVal.current = true;
+    }, [searchParams, val]);
 
     const onSave = () => {
         setCardObj(val);
