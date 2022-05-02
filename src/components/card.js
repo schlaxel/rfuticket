@@ -8,6 +8,7 @@ import {
     Edit,
     CircleWithCross,
 } from 'styled-icons/entypo/';
+import { useSearchParams } from 'react-router-dom';
 
 const Wrapper = styled.div`
     flex: 1;
@@ -62,24 +63,40 @@ const Nummer = styled.div`
     font-weight: 600;
 `;
 
+const Info = styled.div`
+    display: flex;
+    width: 90%;
+    justify-content: space-around;
+    margin-top: 10px;
+`;
+const Elem = styled.div`
+    font-weight: 600;
+`;
+
 const Card = () => {
+    const initObj = { id: '0123456789', platz: '', reihe: '' };
+
     const [scale, setScale] = useState(4);
     const [isEdit, setIsEdit] = useState(false);
-    const [cardId, setCardId] = useState('0123456789');
+    const [cardObj, setCardObj] = useState(initObj);
+    const [searchParams] = useSearchParams();
 
     useEffect(() => {
-        let cardIdFromLS = JSON.parse(localStorage.getItem('cardId'));
-        if (cardIdFromLS) {
+        let cardObjFromLS = JSON.parse(localStorage.getItem('cardObj'));
+        if (cardObjFromLS) {
             // code existiert bereits in Local Storage
-            setCardId(cardIdFromLS);
+            setCardObj(cardObjFromLS);
         }
 
-        console.log(cardId, 'cardId');
+        if (searchParams.get('id')) {
+            setIsEdit(true);
+        }
+
         try {
             // The return value is the canvas element
             bwipjs.toCanvas('mycanvas', {
                 bcid: 'datamatrix', // Barcode type
-                text: cardId, // Text to encode
+                text: cardObj.id, // Text to encode
                 scale, // 3x scaling factor
                 includetext: true, // Show human-readable text
                 textxalign: 'center', // Always good to set this
@@ -88,25 +105,41 @@ const Card = () => {
             // `e` may be a string or Error object
             console.log(e);
         }
-    }, [isEdit, cardId, scale]);
+    }, [isEdit, scale, cardObj.id, searchParams]);
 
-    const onSetCardId = (id) => {
-        localStorage.setItem('cardId', JSON.stringify(id));
-        setCardId(id);
+    const onSetCardId = (val) => {
+        setCardObj({ ...val });
+        localStorage.setItem('cardObj', JSON.stringify(val));
         setIsEdit(!isEdit);
+    };
+
+    const renderInfo = () => {
+        if (cardObj.reihe !== '' || cardObj.platz !== '') {
+            return (
+                <Info>
+                    {cardObj.reihe !== '' && (
+                        <Elem>Reihe: {cardObj.reihe}</Elem>
+                    )}
+                    {cardObj.platz !== '' && (
+                        <Elem>Platz: {cardObj.platz}</Elem>
+                    )}
+                </Info>
+            );
+        }
     };
 
     return (
         <Wrapper>
             <Content>
                 {isEdit ? (
-                    <EditComponent setCardId={(id) => onSetCardId(id)} />
+                    <EditComponent setCardObj={(val) => onSetCardId(val)} />
                 ) : (
                     <CardOuter>
                         <CardWrapper>
                             <canvas id="mycanvas"></canvas>
                         </CardWrapper>
-                        <Nummer>{cardId}</Nummer>
+                        {renderInfo()}
+                        <Nummer>{cardObj.id}</Nummer>
                     </CardOuter>
                 )}
             </Content>

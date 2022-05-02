@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { HelpWithCircle } from 'styled-icons/entypo/';
+import { HelpWithCircle, ChevronSmallDown, Share } from 'styled-icons/entypo/';
 import help_circle from '../help_circle.jpg';
+import { useSearchParams } from 'react-router-dom';
 
 const Wrapper = styled.div`
     flex: 1;
@@ -18,7 +19,7 @@ const Input = styled.input`
     border: 0;
     font-size: 20px;
     padding: 20px;
-    margin: 0;
+    margin: 10px 0 0 0;
     text-align: center;
     width: 90%;
 `;
@@ -36,10 +37,10 @@ const Save = styled.button`
     font-size: 15px;
 `;
 
-const HelpWrap = styled.div`
+const BtnWrap = styled.div`
     padding: 10px 0;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
 `;
@@ -51,31 +52,122 @@ const HelpImg = styled.img`
     margin-top: 10px;
 `;
 
-const Edit = ({ setCardId }) => {
-    const [val, setVal] = useState('');
+const MoreIcon = styled(ChevronSmallDown)`
+    transition: transform 0.2s ease-in;
+    ${(props) =>
+        props.active &&
+        `
+        transform: rotate(180deg);
+    `}
+`;
+
+const ShareInput = styled.input`
+    border: 0;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    box-sizing: border-box;
+    width: 100%;
+    color: #fff;
+    border-radius: 10px;
+`;
+
+const Edit = ({ setCardObj }) => {
+    const [val, setVal] = useState({ id: '', platz: '', reihe: '' });
     const [showHelp, setShowHelp] = useState(false);
+    const [showMore, setShowMore] = useState(false);
+    const [showShare, setShowShare] = useState(false);
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    useEffect(() => {
+        let cardObjFromLS = JSON.parse(localStorage.getItem('cardObj'));
+        if (cardObjFromLS) {
+            // code existiert bereits in Local Storage
+            setVal(cardObjFromLS);
+        }
+
+        if (searchParams.get('id')) {
+            const obj = val;
+            obj['id'] = searchParams.get('id');
+            setVal({ ...obj });
+        }
+    }, [searchParams]);
 
     const onSave = () => {
-        setCardId(val);
+        setCardObj(val);
+        if (searchParams.get('id')) {
+            searchParams.delete('id');
+            setSearchParams(searchParams);
+        }
+    };
+
+    const onSetVal = (key, value) => {
+        const obj = val;
+        obj[key] = value;
+        setVal({ ...obj });
+    };
+
+    const handleFocus = (event) => {
+        event.target.select();
+        /*document.execCommand('copy');
+        event.target.focus();*/
     };
 
     return (
         <Wrapper>
-            <Input value={val} onChange={(e) => setVal(e.target.value)} />
+            <Input
+                placeholder="Karten ID"
+                value={val.id}
+                onChange={(e) => onSetVal('id', e.target.value)}
+            />
+            {showMore && (
+                <>
+                    <Input
+                        placeholder="Reihe"
+                        value={val.reihe}
+                        onChange={(e) => onSetVal('reihe', e.target.value)}
+                    />
+                    <Input
+                        placeholder="Platz"
+                        value={val.platz}
+                        onChange={(e) => onSetVal('platz', e.target.value)}
+                    />
+                </>
+            )}
+            <MoreIcon
+                size={24}
+                color="#fff"
+                style={{ marginTop: 10 }}
+                onClick={() => setShowMore(!showMore)}
+                active={showMore}
+            />
             <Save onClick={() => onSave()}>Speichern</Save>
-            <HelpWrap>
+            <BtnWrap>
                 <HelpWithCircle
-                    size={24}
+                    size={30}
                     color="#fff"
                     onClick={() => setShowHelp(!showHelp)}
+                    style={{ marginRight: 10 }}
                 />
-                {showHelp && (
-                    <HelpImg
-                        onClick={() => setShowHelp(!showHelp)}
-                        src={help_circle}
-                    />
-                )}
-            </HelpWrap>
+                <Share
+                    size={30}
+                    color="#fff"
+                    onClick={() => setShowShare(!showShare)}
+                />
+            </BtnWrap>
+            {showHelp && (
+                <HelpImg
+                    onClick={() => setShowHelp(!showHelp)}
+                    src={help_circle}
+                />
+            )}
+            {showShare && (
+                <ShareInput
+                    type="text"
+                    readOnly
+                    value={`${window.location.host}/?id=${val.id}`}
+                    onFocus={(e) => handleFocus(e)}
+                />
+            )}
         </Wrapper>
     );
 };
