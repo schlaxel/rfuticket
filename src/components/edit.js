@@ -89,6 +89,10 @@ const Edit = ({ setCardObj }) => {
         if (searchParams.get('id') && !hasChangedVal.current) {
             const obj = val;
             obj['id'] = searchParams.get('id');
+            if (searchParams.get('reihe') && searchParams.get('platz')) {
+                obj['reihe'] = searchParams.get('reihe');
+                obj['platz'] = searchParams.get('platz');
+            }
             setVal({ ...obj });
         }
 
@@ -99,6 +103,8 @@ const Edit = ({ setCardObj }) => {
         setCardObj(val);
         if (searchParams.get('id')) {
             searchParams.delete('id');
+            searchParams.delete('reihe');
+            searchParams.delete('platz');
             setSearchParams(searchParams);
         }
     };
@@ -167,7 +173,7 @@ const Edit = ({ setCardObj }) => {
                 <ShareInput
                     type="text"
                     readOnly
-                    value={`${window.location.host}/?id=${val.id}`}
+                    value={`${window.location.host}/?id=${val.id}&platz=${val.platz}&reihe=${val.reihe}`}
                     onFocus={(e) => handleFocus(e)}
                 />
             )}

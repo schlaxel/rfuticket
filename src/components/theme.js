@@ -5,6 +5,7 @@ export const Theme = {
         bg3: '#EFEFE5',
         primary: '#c42a2ad4',
         black: '#000',
+        darkGrey: '#222',
         grey: '#666',
     },
     fonts: {

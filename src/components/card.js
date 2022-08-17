@@ -72,6 +72,12 @@ const Info = styled.div`
 const Elem = styled.div`
     font-weight: 600;
 `;
+const NoCardId = styled.p`
+    max-width: 120px;
+    color: ${({ theme }) => theme.colors.black};
+    text-align: center;
+    font-weight: 800;
+`;
 
 const Card = () => {
     const initObj = { id: '0123456789', platz: '', reihe: '' };
@@ -136,7 +142,13 @@ const Card = () => {
                 ) : (
                     <CardOuter>
                         <CardWrapper>
-                            <canvas id="mycanvas"></canvas>
+                            {cardObj.id === '0123456789' ? (
+                                <NoCardId>
+                                    Keine Kartennummer gespeichert!
+                                </NoCardId>
+                            ) : (
+                                <canvas id="mycanvas"></canvas>
+                            )}
                         </CardWrapper>
                         {renderInfo()}
                         <Nummer>{cardObj.id}</Nummer>
