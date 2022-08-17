@@ -18,8 +18,10 @@ const Link = styled.a`
 const Index = () => {
     return (
         <Wrapper>
-            <Link>KIEFER.MEDIA</Link>
-            <Link href="https://kiefer.media/impressum" target="_blank">
+            <Link href="https://kiefer.media/" target="_blank">
+                KIEFER.MEDIA
+            </Link>
+            <Link href="https://kiefer.media/kontakt" target="_blank">
                 Impressum
             </Link>
         </Wrapper>
