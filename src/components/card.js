@@ -8,7 +8,8 @@ import {
     Edit,
     CircleWithCross,
 } from 'styled-icons/entypo/';
-import { useSearchParams } from 'react-router-dom';
+import { CheckboxMultipleBlank } from 'styled-icons/remix-fill';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 
 const Wrapper = styled.div`
     flex: 1;
@@ -63,6 +64,10 @@ const Nummer = styled.div`
     font-weight: 600;
 `;
 
+const Title = styled(Nummer)`
+    margin: 0 0 10px 0;
+`;
+
 const Info = styled.div`
     display: flex;
     width: 90%;
@@ -83,15 +88,26 @@ const Card = () => {
     const initObj = { id: '0123456789', platz: '', reihe: '' };
 
     const [scale, setScale] = useState(4);
+    const [activeCard, setActiveCard] = useState();
     const [isEdit, setIsEdit] = useState(false);
     const [cardObj, setCardObj] = useState(initObj);
     const [searchParams] = useSearchParams();
 
+    const { state } = useLocation();
+
     useEffect(() => {
-        let cardObjFromLS = JSON.parse(localStorage.getItem('cardObj'));
-        if (cardObjFromLS) {
-            // code existiert bereits in Local Storage
-            setCardObj(cardObjFromLS);
+        if (state?.activeCard) {
+            setActiveCard(state.activeCard);
+        }
+
+        if (state?.activeCard || activeCard) {
+            let cardObjFromLS = JSON.parse(localStorage.getItem(activeCard));
+            if (cardObjFromLS) {
+                // code existiert bereits in Local Storage
+                setCardObj(cardObjFromLS);
+            }
+        } else {
+            setIsEdit(true);
         }
 
         if (searchParams.get('id')) {
@@ -111,12 +127,23 @@ const Card = () => {
             // `e` may be a string or Error object
             console.log(e);
         }
-    }, [isEdit, scale, cardObj.id, searchParams]);
+    }, [isEdit, scale, cardObj.id, searchParams, state, activeCard]);
 
     const onSetCardId = (val) => {
         setCardObj({ ...val });
-        localStorage.setItem('cardObj', JSON.stringify(val));
+        setActiveCard(val.id);
+        localStorage.setItem(val.id, JSON.stringify(val));
         setIsEdit(!isEdit);
+        let cards = JSON.parse(localStorage.getItem('cardIds'));
+        if (cards) {
+            cards[val.id] = true;
+        } else {
+            cards = { [val.id]: true };
+        }
+
+        localStorage.setItem('cardIds', JSON.stringify(cards));
+
+        console.log(cards, 'JUST THE CARDS');
     };
 
     const renderInfo = () => {
@@ -138,9 +165,13 @@ const Card = () => {
         <Wrapper>
             <Content>
                 {isEdit ? (
-                    <EditComponent setCardObj={(val) => onSetCardId(val)} />
+                    <EditComponent
+                        activeCard={activeCard}
+                        setCardObj={(val) => onSetCardId(val)}
+                    />
                 ) : (
                     <CardOuter>
+                        {cardObj.name !== '' && <Title>{cardObj.name}</Title>}
                         <CardWrapper>
                             {cardObj.id === '0123456789' ? (
                                 <NoCardId>
@@ -175,7 +206,9 @@ const Card = () => {
                             onClick={() => setIsEdit(!isEdit)}
                         />
                     )}
-
+                    <Link to="/">
+                        <CheckboxMultipleBlank size="30" color="#fff" />
+                    </Link>
                     <CircleWithPlus
                         onClick={() => setScale(scale + 1)}
                         size="30"

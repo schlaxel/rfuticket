@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Home from './components/home';
+import Router from './components/router';
 import { BrowserRouter } from 'react-router-dom';
 
-const App = () => <Home />;
+const App = () => <Router />;
 
 ReactDOM.render(
     <React.StrictMode>

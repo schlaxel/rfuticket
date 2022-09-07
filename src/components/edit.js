@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { HelpWithCircle, ChevronSmallDown, Share } from 'styled-icons/entypo/';
+import {
+    HelpWithCircle,
+    ChevronSmallDown,
+    Share,
+    Trash,
+} from 'styled-icons/entypo/';
 import help_circle from '../help_circle.jpg';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 
 const Wrapper = styled.div`
     flex: 1;
@@ -71,7 +76,7 @@ const ShareInput = styled.input`
     border-radius: 10px;
 `;
 
-const Edit = ({ setCardObj }) => {
+const Edit = ({ setCardObj, activeCard }) => {
     const hasChangedVal = useRef(false);
     const [val, setVal] = useState({ id: '', platz: '', reihe: '' });
     const [showHelp, setShowHelp] = useState(false);
@@ -79,11 +84,15 @@ const Edit = ({ setCardObj }) => {
     const [showShare, setShowShare] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
 
+    const navigate = useNavigate();
+
     useEffect(() => {
-        let cardObjFromLS = JSON.parse(localStorage.getItem('cardObj'));
-        if (cardObjFromLS && !hasChangedVal.current) {
-            // code existiert bereits in Local Storage
-            setVal(cardObjFromLS);
+        if (activeCard) {
+            let cardObjFromLS = JSON.parse(localStorage.getItem(activeCard));
+            if (cardObjFromLS && !hasChangedVal.current) {
+                // code existiert bereits in Local Storage
+                setVal(cardObjFromLS);
+            }
         }
 
         if (searchParams.get('id') && !hasChangedVal.current) {
@@ -97,7 +106,7 @@ const Edit = ({ setCardObj }) => {
         }
 
         hasChangedVal.current = true;
-    }, [searchParams, val]);
+    }, [searchParams, val, activeCard]);
 
     const onSave = () => {
         setCardObj(val);
@@ -107,6 +116,15 @@ const Edit = ({ setCardObj }) => {
             searchParams.delete('platz');
             setSearchParams(searchParams);
         }
+    };
+
+    const deleteCard = () => {
+        // delete from IDS and from localstorage
+        const cardIds = JSON.parse(localStorage.getItem('cardIds'));
+        delete cardIds[activeCard];
+        localStorage.setItem('cardIds', JSON.stringify(cardIds));
+        // then navigate to home
+        navigate('/');
     };
 
     const onSetVal = (key, value) => {
@@ -128,6 +146,11 @@ const Edit = ({ setCardObj }) => {
                 value={val.id}
                 onChange={(e) => onSetVal('id', e.target.value)}
             />
+            <Input
+                placeholder="Karten Name"
+                value={val.name}
+                onChange={(e) => onSetVal('name', e.target.value)}
+            />
             {showMore && (
                 <>
                     <Input
@@ -139,6 +162,11 @@ const Edit = ({ setCardObj }) => {
                         placeholder="Platz"
                         value={val.platz}
                         onChange={(e) => onSetVal('platz', e.target.value)}
+                    />
+                    <Input
+                        placeholder="Block"
+                        value={val.block}
+                        onChange={(e) => onSetVal('block', e.target.value)}
                     />
                 </>
             )}
@@ -161,6 +189,12 @@ const Edit = ({ setCardObj }) => {
                     size={30}
                     color="#fff"
                     onClick={() => setShowShare(!showShare)}
+                />
+                <Trash
+                    size={30}
+                    color="#fff"
+                    onClick={() => deleteCard()}
+                    style={{ marginLeft: 10 }}
                 />
             </BtnWrap>
             {showHelp && (
