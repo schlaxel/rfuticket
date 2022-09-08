@@ -61,22 +61,28 @@ const Control = styled.div`
 const Nummer = styled.div`
     color: ${({ theme }) => theme.colors.fg};
     margin-top: 10px;
-    font-weight: 600;
+    font-weight: 400;
 `;
 
 const Title = styled(Nummer)`
     margin: 0 0 10px 0;
+    font-weight: 600;
 `;
 
 const Info = styled.div`
     display: flex;
-    width: 90%;
+    width: auto;
     justify-content: space-around;
     margin-top: 10px;
 `;
 const Elem = styled.div`
     font-weight: 600;
+    margin: 0 5px;
 `;
+const L = styled.span`
+    font-weight: 400;
+`;
+
 const NoCardId = styled.p`
     max-width: 120px;
     color: ${({ theme }) => theme.colors.black};
@@ -151,10 +157,19 @@ const Card = () => {
             return (
                 <Info>
                     {cardObj.reihe !== '' && (
-                        <Elem>Reihe: {cardObj.reihe}</Elem>
+                        <Elem>
+                            Reihe: <L>{cardObj.reihe}</L>
+                        </Elem>
                     )}
                     {cardObj.platz !== '' && (
-                        <Elem>Platz: {cardObj.platz}</Elem>
+                        <Elem>
+                            Platz: <L>{cardObj.platz}</L>
+                        </Elem>
+                    )}
+                    {cardObj.block !== '' && (
+                        <Elem>
+                            Block: <L>{cardObj.block}</L>
+                        </Elem>
                     )}
                 </Info>
             );
