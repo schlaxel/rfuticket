@@ -19,6 +19,12 @@ const Wrapper = styled.div`
     overflow: hidden;
 `;
 
+const Text = styled.p`
+    max-width: 250px;
+    margin: 10px 0;
+    text-align: center;
+`;
+
 const Input = styled.input`
     background: ${({ theme }) => theme.colors.fg};
     border: 0;
@@ -204,12 +210,18 @@ const Edit = ({ setCardObj, activeCard }) => {
                 />
             )}
             {showShare && (
-                <ShareInput
-                    type="text"
-                    readOnly
-                    value={`${window.location.host}/?id=${val.id}&platz=${val.platz}&reihe=${val.reihe}`}
-                    onFocus={(e) => handleFocus(e)}
-                />
+                <>
+                    <ShareInput
+                        type="text"
+                        readOnly
+                        value={`${window.location.host}/share/?id=${val.id}&platz=${val.platz}&reihe=${val.reihe}&block=${val.block}`}
+                        onFocus={(e) => handleFocus(e)}
+                    />
+                    <Text>
+                        ACHTUNG: Schicke diesen Link nur an Leute, die du
+                        kennst!
+                    </Text>
+                </>
             )}
         </Wrapper>
     );

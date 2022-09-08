@@ -148,8 +148,6 @@ const Card = () => {
         }
 
         localStorage.setItem('cardIds', JSON.stringify(cards));
-
-        console.log(cards, 'JUST THE CARDS');
     };
 
     const renderInfo = () => {
