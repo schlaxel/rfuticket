@@ -26,7 +26,7 @@ const MyButton = styled(Button)`
 `;
 
 const Index = () => {
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
     const [card, setCard] = useState({});
 
     const navigate = useNavigate();
